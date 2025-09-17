@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using POEProg.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<POEProgContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("POEProgContext") ?? throw new InvalidOperationException("Connection string 'POEProgContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
