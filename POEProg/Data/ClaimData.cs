@@ -1,8 +1,8 @@
 ﻿using POEProg.Models;
 
-namespace PROG6212.Data
+namespace POEProg.Data
 {
-    public static class ClaimData
+    public class ClaimData
     {
         // 🔹 In-memory data store for lecturer claims
         private static List<Claim> _claims = new List<Claim>

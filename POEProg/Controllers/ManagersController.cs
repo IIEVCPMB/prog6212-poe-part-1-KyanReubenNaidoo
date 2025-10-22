@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using POEProg.Models;
 using POEProg.Data;
 
@@ -44,7 +43,7 @@ namespace POEProg.Controllers
                     return NotFound();
                 }
 
-                claim.Status = ClaimStatus.Declined;
+                claim.Status = ClaimStatus.Rejected;
                 TempData["Message"] = $"Claim #{id} has been rejected.";
                 return RedirectToAction("Index");
             }
