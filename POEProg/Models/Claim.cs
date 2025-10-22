@@ -16,6 +16,7 @@ namespace POEProg.Models
         [Required]
         [Range(1, 500, ErrorMessage = "Hourly Rate must be between 1 to 500")]
         public double HourlyRate { get; set; }
+        public double Total {  get; set; }
         public string? Notes { get; set; }
         public DateTime DateSubmitted { get; set; } = DateTime.Now;
         public ClaimStatus Status { get; set; } = ClaimStatus.Pending;
