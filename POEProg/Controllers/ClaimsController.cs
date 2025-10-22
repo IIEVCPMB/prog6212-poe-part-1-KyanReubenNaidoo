@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using POEProg.Data;
 using POEProg.Models;
+using POEProg.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +52,7 @@ namespace POEProg.Controllers
                 }
 
                 // Calculate total amount
-                claim.Total = Math.Round(claim.HoursWorked * claim.Rate, 2);
+                claim.Total = Math.Round(claim.HoursWorked * claim.HourlyRate, 2);
 
                 // Handle file upload
                 claim.Documents ??= new List<Document>();
