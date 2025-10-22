@@ -2,7 +2,7 @@
 
 namespace PROG6212.Data
 {
-    public static class ClaimDataStore
+    public static class ClaimData
     {
         // 🔹 In-memory data store for lecturer claims
         private static List<Claim> _claims = new List<Claim>
