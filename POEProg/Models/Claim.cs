@@ -4,15 +4,21 @@ namespace POEProg.Models
 {
     public class Claim
     {
-        [Key]
-        public int ClaimId { get; set; }
-        public int LecturerId { get; set; }
-        public int Month {  get; set; }
-        public double TotalAmount { get; set; }
-        public string Status { get; set; }
-        public DateTime SubmissionDate { get; set; }
-        
-        public Lecturer Lecturer { get; set; }
-         
+        public int Id { get; set; }
+
+        [Required]
+        public string LecturerName { get; set; }
+
+        [Required]
+        [Range(1,500, ErrorMessage = "Hours worked must be between 1 to 500")]
+        public double HoursWorked { get; set; }
+
+        [Required]
+        [Range(1, 500, ErrorMessage = "Hourly Rate must be between 1 to 500")]
+        public double HourlyRate { get; set; }
+        public string? Notes { get; set; }
+        public DateTime DateSubmitted { get; set; } = DateTime.Now;
+        public ClaimStatus Status { get; set; } = ClaimStatus.Pending;
+        public List<Document> Documents { get; set; } = new();  
     }
 }
