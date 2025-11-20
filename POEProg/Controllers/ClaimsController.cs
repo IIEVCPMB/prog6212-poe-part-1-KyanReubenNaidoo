@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using POEProg.Data;
 using POEProg.Models;
 using POEProg.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace POEProg.Controllers
 {
@@ -21,22 +15,22 @@ namespace POEProg.Controllers
             _environment = environment;
             _encryptionService = new FileEncryptionService();
         }
+
         public IActionResult Index()
         {
-            try
-            {
-                var claims = ClaimData.GetAllClaims();
-                return View(claims);
-            }
-            catch (Exception)
-            {
-                ViewBag.Error = "Unable to load claims.";
-                return View(new List<Claim>());
-            }
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+                return RedirectToAction("Login", "Account");
+
+            var email = HttpContext.Session.GetString("Email");
+            var claims = ClaimData.GetAllClaims()
+                .Where(c => c.LecturerName == email).ToList();
+            return View(claims);
         }
 
         public IActionResult SubmitClaim()
         {
+            if (HttpContext.Session.GetString("Role") != "Lecturer")
+                return RedirectToAction("Login", "Account");
             return View();
         }
 
@@ -44,87 +38,70 @@ namespace POEProg.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile uploadedFile)
         {
-            try
+            var email = HttpContext.Session.GetString("Email");
+            var lecturer = UserData.GetUserByEmail(email);
+            if (lecturer == null) return RedirectToAction("Login", "Account");
+
+            claim.LecturerName = lecturer.Email;
+            claim.HourlyRate = lecturer.HourlyRate;
+
+            if (claim.HoursWorked > 180)
+                ModelState.AddModelError("HoursWorked", "Cannot exceed 180 hours per month.");
+
+            if (!ModelState.IsValid) return View(claim);
+
+            claim.Total = Math.Round(claim.HoursWorked * claim.HourlyRate, 2);
+
+            // File upload logic (same as before)
+            if (uploadedFile != null && uploadedFile.Length > 0)
             {
-                if (!ModelState.IsValid)
+                var allowedExtensions = new[] { ".pdf", ".docx", ".xlsx" };
+                var ext = Path.GetExtension(uploadedFile.FileName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(ext))
                 {
+                    ViewBag.Error = "Invalid file type";
+                    return View(claim);
+                }
+                if (uploadedFile.Length > 5_000_000)
+                {
+                    ViewBag.Error = "File too large (max 5MB)";
                     return View(claim);
                 }
 
-                // Calculate total amount
-                claim.Total = Math.Round(claim.HoursWorked * claim.HourlyRate, 2);
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                Directory.CreateDirectory(uploadsFolder);
 
-                // Handle file upload
-                claim.Documents ??= new List<Document>();
+                var encryptedName = Guid.NewGuid() + ".encrypted";
+                var path = Path.Combine(uploadsFolder, encryptedName);
 
-                if (uploadedFile != null && uploadedFile.Length > 0)
+                using var stream = uploadedFile.OpenReadStream();
+                await _encryptionService.EncryptFileAsync(stream, path);
+
+                claim.Documents.Add(new Document
                 {
-                    var allowedExtensions = new[] { ".pdf", ".docx", ".xlsx" };
-                    var ext = Path.GetExtension(uploadedFile.FileName).ToLowerInvariant();
-
-                    if (!allowedExtensions.Contains(ext))
-                    {
-                        ViewBag.Error = "Invalid file type. Only PDF, DOCX, XLSX allowed.";
-                        return View(claim);
-                    }
-
-                    if (uploadedFile.Length > 5_000_000)
-                    {
-                        ViewBag.Error = "File too large (max 5MB).";
-                        return View(claim);
-                    }
-
-                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
-                    Directory.CreateDirectory(uploadsFolder);
-
-                    var encryptedFileName = Guid.NewGuid() + ".encrypted";
-                    var filePath = Path.Combine(uploadsFolder, encryptedFileName);
-
-                    using (var stream = uploadedFile.OpenReadStream())
-                    {
-                        await _encryptionService.EncryptFileAsync(stream, filePath);
-                    }
-
-                    claim.Documents.Add(new Document
-                    {
-                        FileName = uploadedFile.FileName,
-                        EncryptedName = encryptedFileName,
-                        Size = uploadedFile.Length,
-                        UploadDate = DateTime.UtcNow
-                    });
-                }
-
-                // Add claim to in-memory data
-                ClaimData.AddClaims(claim);
-
-                TempData["Success"] = "Claim submitted successfully!";
-                return RedirectToAction(nameof(Index));
+                    FileName = uploadedFile.FileName,
+                    EncryptedName = encryptedName,
+                    Size = uploadedFile.Length,
+                    UploadDate = DateTime.UtcNow
+                });
             }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error submitting claim: " + ex.Message;
-                return View(claim);
-            }
+
+            ClaimData.AddClaim(claim);
+            TempData["Success"] = "Claim submitted successfully!";
+            return RedirectToAction("Index");
         }
+
         public async Task<IActionResult> DownloadDocument(string encryptedName, string originalName)
         {
-            try
+            var filePath = Path.Combine(_environment.WebRootPath, "uploads", encryptedName);
+            if (!System.IO.File.Exists(filePath))
             {
-                string filePath = Path.Combine(_environment.WebRootPath, "uploads", encryptedName);
-                if (!System.IO.File.Exists(filePath))
-                {
-                    TempData["Error"] = "File not found.";
-                    return RedirectToAction(nameof(Index));
-                }
+                TempData["Error"] = "File not found";
+                return RedirectToAction("Index");
+            }
 
-                var stream = await _encryptionService.DecryptFileAsync(filePath);
-                return File(stream, "application/octet-stream", originalName);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Error downloading file: " + ex.Message;
-                return RedirectToAction(nameof(Index));
-            }
+            var stream = await _encryptionService.DecryptFileAsync(filePath);
+            return File(stream, "application/octet-stream", originalName);
         }
     }
 }

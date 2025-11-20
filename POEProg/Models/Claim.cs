@@ -10,16 +10,18 @@ namespace POEProg.Models
         public string LecturerName { get; set; }
 
         [Required]
-        [Range(1,500, ErrorMessage = "Hours worked must be between 1 to 500")]
+        [Range(1, 180, ErrorMessage = "Hours worked cannot exceed 180.")]
         public double HoursWorked { get; set; }
 
         [Required]
-        [Range(1, 500, ErrorMessage = "Hourly Rate must be between 1 to 500")]
         public double HourlyRate { get; set; }
-        public double Total {  get; set; }
+
+        public double Total { get; set; }
         public string? Notes { get; set; }
-        public DateTime DateSubmitted { get; set; } = DateTime.Now;
+        public DateTime DateSubmitted { get; set; } = DateTime.UtcNow;
         public ClaimStatus Status { get; set; } = ClaimStatus.Pending;
-        public List<Document> Documents { get; set; } = new();  
+        public List<Document> Documents { get; set; } = new();
     }
 }
+
+

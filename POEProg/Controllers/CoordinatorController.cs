@@ -8,49 +8,31 @@ namespace POEProg.Controllers
     {
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetString("Role") != "Coordinator")
+                return RedirectToAction("Login", "Account");
+
             var pendingClaims = ClaimData.GetClaimsByStatus(ClaimStatus.Pending);
             return View(pendingClaims);
         }
+
         public IActionResult Verify(int id)
         {
-            try
-            {
-                var claim = ClaimData.GetClaimById(id);
-                if (claim == null)
-                {
-                    return NotFound();
-                }
+            var claim = ClaimData.GetClaimById(id);
+            if (claim == null) return NotFound();
 
-                claim.Status = ClaimStatus.Verified;
-                TempData["Message"] = $"Claim #{id} has been verified.";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "An error occurred: " + ex.Message;
-                return RedirectToAction("Index");
-            }
-
+            claim.Status = ClaimStatus.Verified;
+            TempData["Message"] = $"Claim #{id} verified.";
+            return RedirectToAction("Index");
         }
+
         public IActionResult Reject(int id)
         {
-            try
-            {
-                var claim = ClaimData.GetClaimById(id);
-                if (claim == null)
-                {
-                    return NotFound();
-                }
+            var claim = ClaimData.GetClaimById(id);
+            if (claim == null) return NotFound();
 
-                claim.Status = ClaimStatus.Rejected;
-                TempData["Message"] = $"Claim #{id} has been rejected.";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "An error occurred: " + ex.Message;
-                return RedirectToAction("Index");
-            }
+            claim.Status = ClaimStatus.Rejected;
+            TempData["Message"] = $"Claim #{id} rejected.";
+            return RedirectToAction("Index");
         }
     }
 }

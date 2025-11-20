@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using POEProg.Models;
 using POEProg.Data;
+using POEProg.Models;
 
 namespace POEProg.Controllers
 {
@@ -8,50 +8,31 @@ namespace POEProg.Controllers
     {
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetString("Role") != "Manager")
+                return RedirectToAction("Login", "Account");
+
             var verifiedClaims = ClaimData.GetClaimsByStatus(ClaimStatus.Verified);
             return View(verifiedClaims);
         }
 
         public IActionResult Approve(int id)
         {
-            try
-            {
-                var claim = ClaimData.GetClaimById(id);
-                if (claim == null)
-                {
-                    return NotFound();
-                }
+            var claim = ClaimData.GetClaimById(id);
+            if (claim == null) return NotFound();
 
-                claim.Status = ClaimStatus.Approved;
-                TempData["Message"] = $"Claim #{id} has been approved.";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "An error occurred: " + ex.Message;
-                return RedirectToAction("Index");
-            }
+            claim.Status = ClaimStatus.Approved;
+            TempData["Message"] = $"Claim #{id} approved.";
+            return RedirectToAction("Index");
         }
 
         public IActionResult Reject(int id)
         {
-            try
-            {
-                var claim = ClaimData.GetClaimById(id);
-                if (claim == null)
-                {
-                    return NotFound();
-                }
+            var claim = ClaimData.GetClaimById(id);
+            if (claim == null) return NotFound();
 
-                claim.Status = ClaimStatus.Rejected;
-                TempData["Message"] = $"Claim #{id} has been rejected.";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "An error occurred: " + ex.Message;
-                return RedirectToAction("Index");
-            }
+            claim.Status = ClaimStatus.Rejected;
+            TempData["Message"] = $"Claim #{id} rejected.";
+            return RedirectToAction("Index");
         }
     }
 }
