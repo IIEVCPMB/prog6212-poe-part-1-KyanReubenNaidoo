@@ -5,41 +5,42 @@
 }
 
 <div class="container mt-5" style="max-width:500px;">
-    <h2>Edit User</h2>
+    <h2>@ViewData["Title"]</h2>
 
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="Id" />
+
         <div class="mb-3">
-            <label asp-for="Name" class="form-label"></label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Surname" class="form-label"></label>
-            <input asp-for="Surname" class="form-control" />
-            <span asp-validation-for="Surname" class="text-danger"></span>
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
+            <input asp-for="Email" class="form-control" type="email" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="HourlyRate" class="form-label"></label>
-            <input asp-for="HourlyRate" class="form-control" type="number" />
+            <input asp-for="HourlyRate" class="form-control" type="number" step="0.01" />
             <span asp-validation-for="HourlyRate" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="Role" class="form-label"></label>
             <select asp-for="Role" class="form-select">
-                <option value="Lecturer">Lecturer</option>
-                <option value="Coordinator">Coordinator</option>
-                <option value="Manager">Manager</option>
-                <option value="HR">HR</option>
+                <option value="Lecturer" selected="@Model.Role.ToString() == " Lecturer"">Lecturer</option>
+                <option value="Coordinator" selected="@Model.Role.ToString() == " Coordinator"">Coordinator</option>
+                <option value="Manager" selected="@Model.Role.ToString() == " Manager"">Manager</option>
+                <option value="HR" selected="@Model.Role.ToString() == " HR"">HR</option>
             </select>
             <span asp-validation-for="Role" class="text-danger"></span>
         </div>

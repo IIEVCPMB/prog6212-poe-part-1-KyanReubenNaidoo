@@ -43,7 +43,8 @@ namespace POEProg.Controllers
             if (lecturer == null) return RedirectToAction("Login", "Account");
 
             claim.LecturerName = lecturer.Email;
-            claim.HourlyRate = lecturer.HourlyRate;
+            claim.HourlyRate = (double)lecturer.HourlyRate;
+
 
             if (claim.HoursWorked > 180)
                 ModelState.AddModelError("HoursWorked", "Cannot exceed 180 hours per month.");

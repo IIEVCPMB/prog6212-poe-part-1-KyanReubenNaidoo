@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POEProg.Models
 {
@@ -21,6 +22,10 @@ namespace POEProg.Models
         public DateTime DateSubmitted { get; set; } = DateTime.UtcNow;
         public ClaimStatus Status { get; set; } = ClaimStatus.Pending;
         public List<Document> Documents { get; set; } = new();
+         public int UserId { get; set; } // link to lecturer
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+
     }
 }
 

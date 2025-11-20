@@ -7,23 +7,25 @@ namespace POEProg.Models
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; } = string.Empty;
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
 
         [Required]
-        public string Surname { get; set; } = string.Empty;
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; }
 
         [Required]
-        [Range(1, 500)]
-        public double HourlyRate { get; set; }
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
+        [Display(Name = "Hourly Rate")]
+        public decimal HourlyRate { get; set; }
 
         [Required]
-        public string Role { get; set; } = "Lecturer"; // Lecturer, Coordinator, Manager, HR
-
-        [Required]
-        public string Password { get; set; } = string.Empty;
+        public Role Role { get; set; }
     }
 }

@@ -76,11 +76,12 @@ namespace POEProg.Controllers
                         foreach (var user in users)
                         {
                             table.Cell().Text(user.Id.ToString());
-                            table.Cell().Text(user.Name);
-                            table.Cell().Text(user.Surname);
+                            table.Cell().Text(user.FirstName);   // updated
+                            table.Cell().Text(user.LastName);    // updated
                             table.Cell().Text(user.Email);
                             table.Cell().Text(user.HourlyRate.ToString("C"));
                         }
+
                     });
                 });
             });

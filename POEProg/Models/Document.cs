@@ -27,8 +27,8 @@ namespace POEProg.Models
         // Foreign key to Claim
         [Required]
         public int ClaimId { get; set; }
-
         [ForeignKey("ClaimId")]
         public Claim? Claim { get; set; }
+
     }
 }

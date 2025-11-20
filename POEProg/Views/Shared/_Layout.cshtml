@@ -1,42 +1,98 @@
-﻿<!DOCTYPE html>
+﻿@using POEProg.Models
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - POEProg</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/POEProg.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">POEProg</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Lecturers" asp-action="Index">Lecturer</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Claims" asp-action="Index">Claim</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Approvals" asp-action="Index">Approval</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Documents" asp-action="Index">Document</a>
-                        </li>
+                        @{
+                            var role = HttpContextAccessor.HttpContext?.Session.GetString("Role");
+                        }
+
+                        @* Common links for logged-in users *@
+                        @if (!string.IsNullOrEmpty(role))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Lecturers" asp-action="Index">Lecturer</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Claims" asp-action="Index">Claim</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Approvals" asp-action="Index">Approval</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Documents" asp-action="Index">Document</a>
+                            </li>
+
+                            @* Role-specific links *@
+                            @switch (role)
+                            {
+                                case var r when r == Role.HR.ToString():
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-controller="HR" asp-action="Index">HR Dashboard</a>
+                                    </li>
+                                    break;
+
+                                case var r when r == Role.Coordinator.ToString():
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-controller="Coordinator" asp-action="Index">Coordinator Dashboard</a>
+                                    </li>
+                                    break;
+
+                                case var r when r == Role.Manager.ToString():
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-controller="Managers" asp-action="Index">Manager Dashboard</a>
+                                    </li>
+                                    break;
+                            }
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto">
+                        @{
+                            var email = HttpContextAccessor.HttpContext?.Session.GetString("Email");
+                        }
+
+                        @if (!string.IsNullOrEmpty(email))
+                        {
+                            <li class="nav-item">
+                                <span class="navbar-text me-3">@email</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -48,6 +104,7 @@
             &copy; 2025 - POEProg - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
