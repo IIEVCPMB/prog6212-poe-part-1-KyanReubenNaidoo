@@ -7,40 +7,77 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - POEProg</title>
+
+    <!-- Bootstrap & site styles -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/POEProg.styles.css" asp-append-version="true" />
+
+    <style>
+        /* Custom navbar */
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #007bff !important;
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+        }
+
+            .navbar-nav .nav-link:hover {
+                color: #0056b3 !important;
+            }
+        /* Footer */
+        footer {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+        }
+        /* Main container */
+        main {
+            margin-top: 20px;
+        }
+        /* User badge */
+        .user-badge {
+            font-weight: 500;
+            color: #495057;
+            background-color: #e9ecef;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.25rem;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-light">
+
+    <!-- Navbar -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">POEProg</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         @{
                             var role = HttpContextAccessor.HttpContext?.Session.GetString("Role");
                         }
 
-                        @* Common links for logged-in users *@
                         @if (!string.IsNullOrEmpty(role))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Lecturers" asp-action="Index">Lecturer</a>
+                                <a class="nav-link" asp-controller="Lecturers" asp-action="Index">Lecturer</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Claims" asp-action="Index">Claim</a>
+                                <a class="nav-link" asp-controller="Claims" asp-action="Index">Claim</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Approvals" asp-action="Index">Approval</a>
+                                <a class="nav-link" asp-controller="Approvals" asp-action="Index">Approval</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Documents" asp-action="Index">Document</a>
+                                <a class="nav-link" asp-controller="Documents" asp-action="Index">Document</a>
                             </li>
 
                             @* Role-specific links *@
@@ -48,43 +85,43 @@
                             {
                                 case var r when r == Role.HR.ToString():
                                     <li class="nav-item">
-                                        <a class="nav-link text-dark" asp-controller="HR" asp-action="Index">HR Dashboard</a>
+                                        <a class="nav-link fw-bold text-primary" asp-controller="HR" asp-action="Index">HR Dashboard</a>
                                     </li>
                                     break;
 
                                 case var r when r == Role.Coordinator.ToString():
                                     <li class="nav-item">
-                                        <a class="nav-link text-dark" asp-controller="Coordinator" asp-action="Index">Coordinator Dashboard</a>
+                                        <a class="nav-link fw-bold text-success" asp-controller="Coordinator" asp-action="Index">Coordinator Dashboard</a>
                                     </li>
                                     break;
 
                                 case var r when r == Role.Manager.ToString():
                                     <li class="nav-item">
-                                        <a class="nav-link text-dark" asp-controller="Managers" asp-action="Index">Manager Dashboard</a>
+                                        <a class="nav-link fw-bold text-warning" asp-controller="Managers" asp-action="Index">Manager Dashboard</a>
                                     </li>
                                     break;
                             }
                         }
                     </ul>
 
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         @{
                             var email = HttpContextAccessor.HttpContext?.Session.GetString("Email");
                         }
 
                         @if (!string.IsNullOrEmpty(email))
                         {
-                            <li class="nav-item">
-                                <span class="navbar-text me-3">@email</span>
+                            <li class="nav-item me-3">
+                                <span class="user-badge">@email</span>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Logout</a>
+                                <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout">Logout</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="nav-link text-primary" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                         }
                     </ul>
@@ -93,18 +130,22 @@
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
+    <!-- Main content -->
+    <div class="container my-4">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- Footer -->
+    <footer class="text-center border-top">
         <div class="container">
-            &copy; 2025 - POEProg - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - <span class="fw-bold">POEProg</span> -
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
