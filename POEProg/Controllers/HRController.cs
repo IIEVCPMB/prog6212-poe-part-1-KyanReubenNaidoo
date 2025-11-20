@@ -47,7 +47,7 @@ namespace POEProg.Controllers
         public IActionResult GeneratePDF()
         {
             var users = UserData.GetAllUsers();
-            var doc = Document.Create(container =>
+            var doc = QuestPDF.Fluent.Document.Create(container =>
             {
                 container.Page(page =>
                 {
